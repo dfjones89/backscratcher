@@ -1,0 +1,29 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Required for `rake assets:precompile` to run without error
+        DATABASE_URL: postgres://postgres:postgres@postgres:5432/backscratcher
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    volumes:
+      - .:/rails
+    ports:
+      - "3000:3000"
+    command: ["bin/dev"]
+    restart: unless-stopped
+
+  # The postgres docker images will automatically mount their own persistent volume.
+  # The name of the volume will be pseudorandom, not friendly. Take care when deleting volumes on the host.
+  postgres:
+    image: postgres:13.5
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    restart: unless-stopped

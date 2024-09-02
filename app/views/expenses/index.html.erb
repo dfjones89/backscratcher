@@ -1,0 +1,48 @@
+<div>
+  <div class="px-4 sm:px-6 lg:px-8">
+    <div class="flow-root">
+      <%= form_with url: expenses_path, method: :get, data: { turbo_frame: "expenses", turbo_action: "advance", controller: "search", action: "input->search#submit keyup@window->search#handleKeyup" }, class: "mb-4" do |form| %>
+        <div class="flex items-center">
+          <%= form.text_field :search, placeholder: "Search for expense", autofocus: true, class: "flex-grow rounded-md border-0 py-1.5 pr-14 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6", data: { search_target: "input" } %>
+          <%= form.submit "Search", class: "ml-2 rounded-md bg-sky-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600" %>
+        </div>
+      <% end %>
+
+      <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+        <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+          <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+            <%= turbo_frame_tag "expenses" do %>
+              <table class="min-w-full divide-y divide-gray-300">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Date</th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Description</th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Amount</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                   <% @expenses.each do |expense| %>
+                    <tr>
+                      <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"><%= expense.date.strftime('%d-%m-%Y') %></td>
+                      <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        <span class="hidden md:inline"><%= expense.description %></span>
+                        <span class="md:hidden"><%= truncate(expense.description, length: 20) %></span>
+                      </td>
+                      <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"><%= number_to_currency(expense.amount, unit: "£", precision: 2) %></td>
+                    </tr>
+                   <% end %>
+                </tbody>
+              </table>
+
+              <nav class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6" aria-label="Pagination">
+                <div class="flex flex-1 justify-between sm:justify-end">
+                  <%== pagy_nav(@pagy, link_extra: 'data-turbo-action="advance"') if @pagy.pages > 1 %>
+                </div>
+              </nav>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
